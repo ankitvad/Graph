@@ -26,7 +26,7 @@ class Atom(object):
 
     def showProperties(self):
         print "\n# Total Properties : ",len(self.properties)
-        print "Atom Name - ",self.label
+        print "Atom - ",self.label
         print "Properties:"
         for x in self.properties:
             print x," -> ",self.properties[x]
@@ -36,6 +36,7 @@ class Atom(object):
 
     def showRelationships(self):
         print "\n# Total Relationships : ",len(self.relationships)
+        print "Atom - ",self.label
         for x in self.relationships:
             if self.relationships[x][1]==0:
                 print x," -> ",(self.relationships[x][0],"Outgoing")
@@ -68,6 +69,7 @@ class Graph(object):
 
     def showAtoms(self):
         print "\n# Total Atoms : ",Graph.total_atoms
+        print "Graph Name - ",self.name
         for x in range(1,Graph.total_atoms+1):
             print x," -> ",self.s["id"+str(x)].label
 
@@ -93,8 +95,11 @@ if __name__=="__main__":
         print "3. Delete a database"
         print "4. Details of a database"
         print "5. Search through a database"
+        print "6. Exit"
         print
         a = raw_input("Enter your choice :")
+        if a=="6":
+            sys.exit()
     except KeyboardInterrupt:
         sys.exit()
     
