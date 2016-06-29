@@ -9,6 +9,13 @@ class Atom(object):
         self.properties=dict()
         self.relationships=dict()
         self.__save()
+
+    def about(self):
+        print "\n# About Atom"
+        print "Atom Name - ",self.label
+        print "ID - ",self.id
+        print "Total Properties : ",len(self.properties)
+        print "Total Relationships : ",len(self.relationships)
         
     def property(self,name,value):
         self.properties[name]=value
@@ -17,8 +24,9 @@ class Atom(object):
     def relationship(self,name,value,y,direction=0):
         # 0 denotes that the relationship goes from this object to the another object(outgoing relation)
         # 1 denotes that the relationship comes from another object to this object(incoming relation)
-        self.relationships[name]=(value,direction)
-        #y.relationship(name,value,self,int(not direction))
+        # relations are stored like this in db ---> 'id1rid2' = "whatever maybe the value"
+        data_label = self.id+"r"+y.id
+        self.relationships[data_label]=(value,direction)
         self.__save()
         
     def __save(self):
@@ -72,6 +80,9 @@ class Graph(object):
         print "Graph Name - ",self.name
         for x in range(1,Graph.total_atoms+1):
             print x," -> ",self.s["id"+str(x)].label
+
+    def getAtomFromName(self,name):
+        return self.editAtom()
 
     def editAtom(self,atom_id):
         return self.s["id"+str(atom_id)]
