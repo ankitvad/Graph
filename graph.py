@@ -1,9 +1,17 @@
 import shelve
 import sys
 
+# This class will be used to share common data between Atom and Graph class
+class CommonDataStorage(object):
+
+    def __init__(self):
+        pass
+    pass
+
 class Atom(object):
-    
+
     def __init__(self,label,id):
+        # At present every atom is saving its properties and relationships
         self.label=label
         self.id=id
         self.properties=dict()
@@ -16,19 +24,25 @@ class Atom(object):
         print "ID - ",self.id
         print "Total Properties : ",len(self.properties)
         print "Total Relationships : ",len(self.relationships)
-        
+
     def property(self,name,value):
         self.properties[name]=value
         self.__save()
-    
+
     def relationship(self,name,value,y,direction=0):
         # 0 denotes that the relationship goes from this object to the another object(outgoing relation)
         # 1 denotes that the relationship comes from another object to this object(incoming relation)
         # relations are stored like this in db ---> 'id1rid2' = "whatever maybe the value"
-        data_label = self.id+"r"+y.id
-        self.relationships[data_label]=(value,direction)
-        self.__save()
-        
+        print "\n #Creating Relationship"
+        if direction==0:
+            data_label = (name,self.id,y.id)
+        elif direction==1:
+            data_label = (name,y.id,self.id)
+        self.relationships[data_label]=value
+        print self.relationships
+        self.newRelationships = True
+        # self.__save()
+
     def __save(self):
         self.stateChanged=True
 
@@ -62,12 +76,12 @@ class Atom(object):
 
 class Graph(object):
     total_atoms=0
-    
+
     def __init__(self,name):
         self.name=name
         self.atoms={}
-        self.s=shelve.open(name) 
-     
+        self.s=shelve.open(name)
+
     def createAtom(self,label):
         Graph.total_atoms+=1
         id = "id"+str(Graph.total_atoms)
@@ -88,19 +102,30 @@ class Graph(object):
         return self.s["id"+str(atom_id)]
 
     def saveAtom(self,atom):
+        # First save relationships so that the relationships
+        # attribute can be deleted after saving the relation in
+        # in the database. Hence, freeing up space.
         self.s["id"+str(atom_id)] = atom
 
     def close(self):
         self.s.close()
 
-
+# Storage Structure of data in database
+# Types of items in shelve
+# id1 -> Atom
+# relationship is a common thing that exists between two nodes,
+# there should be a central location where all the relationships
+# are stored. WHat should be the structure of this datastore so that
+# searching for relations is very simple and fast.
+# r_id1 --> relationships
+# relation[key],id -> value
 
 
 
 
 if __name__=="__main__":
     try:
-        print "\n\t\t\t Atom Graph Database\n"
+        print "\n\t\t\t Graph Database\n"
         print "1. Create a database"
         print "2. Edit a database"
         print "3. Delete a database"
@@ -113,4 +138,3 @@ if __name__=="__main__":
             sys.exit()
     except KeyboardInterrupt:
         sys.exit()
-    
